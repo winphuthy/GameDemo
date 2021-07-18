@@ -13,6 +13,30 @@ public class Tile : MonoBehaviour
     public bool isWalkable;
     GameMaster gm;
     public Sprite tileGraphics;
+    public Vector2Int position;
+    public Vector2Int positionUp;
+    public Vector2Int positionDown;
+    public Vector2Int positionLeft;
+    public Vector2Int positionRight;
+
+
+    void OnEnable()
+    {
+        position = Vector2Int.RoundToInt(transform.position);
+        positionUp.Set(position.x, position.y + 1);
+        positionDown.Set(position.x, position.y - 1);
+        positionRight.Set(position.x + 1, position.y);
+        positionLeft.Set(position.x - 1, position.y);
+    }
+
+    public int MoveCost(String moveCost)
+    {
+        Hashtable MoveCost = new Hashtable();
+        MoveCost.Add("Onfoot", 1);
+        MoveCost.Add("RideHorse", 1);
+        MoveCost.Add("Fly", 1);
+        return (int)MoveCost[moveCost];
+    }
 
     // Start is called before the first frame update
     void Start()
@@ -39,6 +63,7 @@ public class Tile : MonoBehaviour
     {
         rend.color = HihglightedColor;
         isWalkable = true;
+        Debug.Log(this.transform.position.ToString() + "highlight trigged");
     }
 
     public void Reset()

@@ -125,13 +125,14 @@ MonoBehaviour:
   m_Name: 
   m_EditorClassIdentifier: 
   selected: 0
-  RestMoveable: 5
+  RestMoveable: 3
   hasMoved: 0
-  MoveSpeed: 10
+  MoveSpeed: 3
   PlayerNumber: 2
+  MoveMode: Onfoot
   AttackRange: 1
   hasAttacked: 0
-  AttackSquare: {fileID: 0}
+  AttackSquare: {fileID: 6621321947127473435}
   health: 10
   attackDamage: 5
   defenseDamage: 2

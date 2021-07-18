@@ -8,7 +8,8 @@
     <Platform Condition=" '$(Platform)' == '' ">AnyCPU</Platform>
     <ProductVersion>10.0.20506</ProductVersion>
     <SchemaVersion>2.0</SchemaVersion>
-    <RootNamespace></RootNamespace>
+    <RootNamespace>
+    </RootNamespace>
     <ProjectGuid>{E9F6A016-2E51-0BDE-BADE-0AF8BEBF4684}</ProjectGuid>
     <OutputType>Library</OutputType>
     <AppDesignerFolder>Properties</AppDesignerFolder>
@@ -56,10 +57,16 @@
     <Analyzer Include="C:\Program Files (x86)\Microsoft Visual Studio Tools for Unity\16.0\Analyzers\Microsoft.Unity.Analyzers.dll" />
   </ItemGroup>
   <ItemGroup>
+    <Compile Include="Assets\Testing.cs" />
     <Compile Include="Assets\Unit.cs" />
     <Compile Include="Assets\Tile.cs" />
-    <Compile Include="Assets\GameMaster.cs" />
     <Compile Include="Assets\HoverEffect.cs" />
+    <Compile Include="Assets\Tile_Plain.cs" />
+    <Compile Include="Assets\Navigation.cs" />
+    <Compile Include="Assets\GameMaster.cs" />
+    <Compile Include="Assets\Tile_hill.cs" />
+    <Compile Include="Assets\Tile_Forest.cs" />
+    <Compile Include="Assets\Initalization.cs" />
   </ItemGroup>
   <ItemGroup>
     <Reference Include="UnityEngine">

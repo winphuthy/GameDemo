@@ -8,10 +8,13 @@ public class Unit : MonoBehaviour
     // Start is called before the first frame update
     public bool selected;
     GameMaster gm;
+    Navigation N;
     public int RestMoveable;
     public bool hasMoved;
-    public float MoveSpeed;
+    public int MoveSpeed;
     public int PlayerNumber;
+    [SerializeField]
+    public String MoveMode = "Onfoot";
 
     public int AttackRange;
     List<Unit> enemiesInRange = new List<Unit>();
@@ -22,16 +25,29 @@ public class Unit : MonoBehaviour
     public int attackDamage;
     public int defenseDamage;
     public int armor;
+    public Vector2Int position;
+
+
+
+
+
+
+    private void OnEnable()
+    {
+        UpdatePosition();
+    }
 
     private void Start()
     {
         gm = FindObjectOfType<GameMaster>();
+        N = FindObjectOfType<Navigation>();
     }
 
 
     private void OnMouseDown()
     {
         ResetAttackableIcon();
+        UpdatePosition();
 
         if (selected == true)//if this unit has been selected, cancel selected.
         {
@@ -53,14 +69,16 @@ public class Unit : MonoBehaviour
 
                 gm.ResetTiles();
                 GetEnemies();
-                //Debug.Log("get enemies");
-                GetWalkableTiles();//search available tile
+                Debug.Log("before Achievable" + this.transform.position.ToString());
+                N.Achievable(this, N.GetTile(this), this.RestMoveable);//GetWalkableTiles();//search available tile
+
             }
             
         }
 
         Collider2D col = Physics2D.OverlapCircle(Camera.main.ScreenToWorldPoint(Input.mousePosition), 0.2f);
         Unit unit = col.GetComponent<Unit>();
+
 
         if (gm.selectedUnit != null)
         {
@@ -69,6 +87,11 @@ public class Unit : MonoBehaviour
                 gm.selectedUnit.Attack(unit);
             }
         }
+    }
+
+    private void UpdatePosition()
+    {
+        position = Vector2Int.RoundToInt(transform.position);
     }
 
     private void Attack(Unit enemy)
@@ -96,7 +119,7 @@ public class Unit : MonoBehaviour
         }
     }
 
-    void GetWalkableTiles()
+    public void GetWalkableTiles()
     {
         if (hasMoved == true)//if no more step left
         {
@@ -104,7 +127,8 @@ public class Unit : MonoBehaviour
         }
         foreach (Tile tile in FindObjectsOfType<Tile>())
         {
-            if (Mathf.Abs(transform.position.x - tile.transform.position.x) + Mathf.Abs(transform.position.y - tile.transform.position.y) <= RestMoveable+1)
+            if (Mathf.Abs(transform.position.x - tile.transform.position.x) + 
+                Mathf.Abs(transform.position.y - tile.transform.position.y) <= RestMoveable)
             {
                 tile.Highlight();
             }
@@ -119,7 +143,7 @@ public class Unit : MonoBehaviour
 
         foreach (Unit unit in FindObjectsOfType<Unit>())
         {
-            if (Mathf.Abs(transform.position.x - unit.transform.position.x) + Mathf.Abs(transform.position.y - unit.transform.position.y) <= AttackRange+1)
+            if (Mathf.Abs(transform.position.x - unit.transform.position.x) + Mathf.Abs(transform.position.y - unit.transform.position.y) <= AttackRange)
             {
                 if (unit.PlayerNumber != gm.PlayerTurn)
                 {
