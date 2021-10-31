@@ -1,0 +1,102 @@
+﻿<?xml version="1.0" encoding="utf-8"?>
+<ClassDiagram MajorVersion="1" MinorVersion="1">
+  <Class Name="Item">
+    <Position X="9.25" Y="0.75" Width="1.5" />
+    <TypeIdentifier>
+      <HashCode>AAAAAAAAAQAAAAIAgAAAAAQAAAAAAAAAAAAAAAAAAAA=</HashCode>
+      <FileName>NewStruct\Item.cs</FileName>
+    </TypeIdentifier>
+  </Class>
+  <Class Name="Weapon">
+    <Position X="8.25" Y="3.75" Width="1.5" />
+    <TypeIdentifier>
+      <HashCode>AEAAAAAAEAAACAAAAAAAAAAAEAAAAAAAAAAAAAAAAAA=</HashCode>
+      <FileName>NewStruct\Weapon.cs</FileName>
+    </TypeIdentifier>
+  </Class>
+  <Class Name="IClass">
+    <Position X="5.5" Y="5.75" Width="1.5" />
+    <TypeIdentifier>
+      <HashCode>AAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAA=</HashCode>
+      <FileName>NewStruct\IClass.cs</FileName>
+    </TypeIdentifier>
+  </Class>
+  <Interface Name="IConsumables">
+    <Position X="6.5" Y="1.5" Width="1.5" />
+    <TypeIdentifier>
+      <HashCode>AAAAAAAAAAAAAAAEAAAAAAAAAAAEAAAAAAAAAAAAAAA=</HashCode>
+      <FileName>NewStruct\IConsumables.cs</FileName>
+    </TypeIdentifier>
+  </Interface>
+  <Interface Name="IAmulet">
+    <Position X="11.75" Y="1.75" Width="1.5" />
+    <TypeIdentifier>
+      <HashCode>AAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAA=</HashCode>
+      <FileName>NewStruct\IAmulet.cs</FileName>
+    </TypeIdentifier>
+  </Interface>
+  <Interface Name="WeaponType">
+    <Position X="12.5" Y="4" Width="2.5" />
+    <TypeIdentifier>
+      <HashCode>AAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAA=</HashCode>
+      <FileName>NewStruct\WeaponType.cs</FileName>
+    </TypeIdentifier>
+  </Interface>
+  <Interface Name="IRangeWeapon">
+    <Position X="12.5" Y="7" Width="2.5" />
+    <TypeIdentifier>
+      <HashCode>AAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAA=</HashCode>
+      <FileName>NewStruct\WeaponType.cs</FileName>
+    </TypeIdentifier>
+  </Interface>
+  <Interface Name="IBluntWeapon">
+    <Position X="12.5" Y="6" Width="2.5" />
+    <TypeIdentifier>
+      <HashCode>AAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAA=</HashCode>
+      <FileName>NewStruct\WeaponType.cs</FileName>
+    </TypeIdentifier>
+  </Interface>
+  <Interface Name="IForgingWeapon">
+    <Position X="12.5" Y="5" Width="2.5" />
+    <TypeIdentifier>
+      <HashCode>AAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAA=</HashCode>
+      <FileName>NewStruct\WeaponType.cs</FileName>
+    </TypeIdentifier>
+  </Interface>
+  <Interface Name="IImplement">
+    <Position X="18.5" Y="4.25" Width="2.5" />
+    <TypeIdentifier>
+      <HashCode>AAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAA=</HashCode>
+      <FileName>NewStruct\WeaponType.cs</FileName>
+    </TypeIdentifier>
+  </Interface>
+  <Interface Name="ICodex">
+    <Position X="18.5" Y="6.75" Width="2.5" />
+    <TypeIdentifier>
+      <HashCode>AAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAA=</HashCode>
+      <FileName>NewStruct\WeaponType.cs</FileName>
+    </TypeIdentifier>
+  </Interface>
+  <Interface Name="IRing">
+    <Position X="17" Y="5.5" Width="2.5" />
+    <TypeIdentifier>
+      <HashCode>AAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAA=</HashCode>
+      <FileName>NewStruct\WeaponType.cs</FileName>
+    </TypeIdentifier>
+  </Interface>
+  <Interface Name="IWand">
+    <Position X="19.75" Y="5.5" Width="2.5" />
+    <TypeIdentifier>
+      <HashCode>AAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAA=</HashCode>
+      <FileName>NewStruct\WeaponType.cs</FileName>
+    </TypeIdentifier>
+  </Interface>
+  <Interface Name="Magical">
+    <Position X="7" Y="8" Width="1.5" />
+    <TypeIdentifier>
+      <HashCode>AAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAA=</HashCode>
+      <FileName>NewStruct\Magical.cs</FileName>
+    </TypeIdentifier>
+  </Interface>
+  <Font Name="Segoe UI" Size="9" />
+</ClassDiagram>

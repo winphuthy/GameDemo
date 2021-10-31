@@ -5,7 +5,6 @@ using UnityEngine;
 
 public class Tile : MonoBehaviour
 {
-
     private SpriteRenderer rend;
     public float hoverAmount;
     public Color HihglightedColor;
@@ -29,13 +28,19 @@ public class Tile : MonoBehaviour
         positionLeft.Set(position.x - 1, position.y);
     }
 
-    public int MoveCost(String moveCost)
+    public int MoveCost(MoveMethod moveCost)
     {
-        Hashtable MoveCost = new Hashtable();
-        MoveCost.Add("Onfoot", 1);
-        MoveCost.Add("RideHorse", 1);
-        MoveCost.Add("Fly", 1);
-        return (int)MoveCost[moveCost];
+        switch (moveCost)
+        {
+            case MoveMethod.Onfoot:
+                return 1;
+            case MoveMethod.Riding:
+                return 1;
+            case MoveMethod.Flying:
+                return 1;
+            default:
+                throw new Exception();
+        }
     }
 
     // Start is called before the first frame update
@@ -44,13 +49,11 @@ public class Tile : MonoBehaviour
         rend = GetComponent<SpriteRenderer>();
         gm = FindObjectOfType<GameMaster>();
         rend.sprite = tileGraphics;
-
     }
 
     private void OnMouseEnter()
     {
         transform.localScale += Vector3.one * hoverAmount;
-
     }
 
     private void OnMouseExit()
@@ -79,6 +82,4 @@ public class Tile : MonoBehaviour
             gm.selectedUnit.Move(this.transform.position);
         }
     }
-
-
 }

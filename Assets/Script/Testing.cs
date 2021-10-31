@@ -10,8 +10,8 @@ public class Testing : MonoBehaviour
     // Start is called before the first frame update
     void Start()
     {
-        N = FindObjectOfType<Navigation>();
-        init = FindObjectOfType<Initalization>();
+        //N = FindObjectOfType<Navigation>();
+        //init = FindObjectOfType<Initalization>();
         /*
         */
         /*GameObject test1 = GameObject.Find("ArmouredRedDemon_0");
@@ -43,26 +43,7 @@ public class Testing : MonoBehaviour
 
 
 
-        Queue<int> testQueue = new Queue<int>();
-
-        testQueue.Enqueue(1);
-        testQueue.Enqueue(1);
-        testQueue.Enqueue(1);
-        testQueue.Enqueue(4);
-        testQueue.Enqueue(1);
-        testQueue.Enqueue(1);
-        testQueue.Enqueue(3);
-        testQueue.Enqueue(1);
-        testQueue.Enqueue(1);
-        testQueue.Enqueue(1);
-        testQueue.Enqueue(1);
-        testQueue.Enqueue(1);
-
-        foreach (var item in testQueue.ToArray())
-        {
-            Debug.Log(item); 
-        } 
-
+       
 
 
     }

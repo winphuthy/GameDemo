@@ -180,15 +180,15 @@ public class Navigation : MonoBehaviour
             foreach (Tile neighbourTiles in neighbour(instant))
             {
                  //save RestMoveable
-                if (neighbourTiles.MoveCost(unit.MoveMode) <= save)//if neighbourTiles cost lower than RestMoveable, mean it is achievable
+                if (neighbourTiles.MoveCost(unit.character.MoveMethod) <= save)//if neighbourTiles cost lower than RestMoveable, mean it is achievable
                 {
-                    if (!HighlightTile.Contains(neighbourTiles.position) || (save - neighbourTiles.MoveCost(unit.MoveMode)) > save)//if neighbourTiles was not be search or the new RestMoveable is higher than previous one
+                    if (!HighlightTile.Contains(neighbourTiles.position) || (save - neighbourTiles.MoveCost(unit.character.MoveMethod)) > save)//if neighbourTiles was not be search or the new RestMoveable is higher than previous one
                     {
                         HighlightTile.Add(neighbourTiles.position);
-                        TileCost.Add(save - neighbourTiles.MoveCost(unit.MoveMode));//add or reset 
+                        TileCost.Add(save - neighbourTiles.MoveCost(unit.character.MoveMethod));//add or reset 
                         neighbourTiles.Highlight();
                         Debug.Log("neighbourTiles position    " + neighbourTiles.position.ToString());
-                        Debug.Log("TileCost    " + neighbourTiles.MoveCost(unit.MoveMode));
+                        Debug.Log("TileCost    " + neighbourTiles.MoveCost(unit.character.MoveMethod));
 
                         Debug.Log("HighlightTile    " + HighlightTile.Count);
                         Debug.Log("TileCost count    " + TileCost.Count);
