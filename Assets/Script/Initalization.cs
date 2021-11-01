@@ -18,7 +18,9 @@ public class Initalization : MonoBehaviour
         }
         GetUnitTable();
     }
-
+    /// <summary>
+    /// get all unit position information 
+    /// </summary>
     public void GetUnitTable()
     {
         foreach (Unit unit in FindObjectsOfType<Unit>())

@@ -7,7 +7,7 @@ public class Unit : MonoBehaviour
 {
     // Start is called before the first frame update
 
-    public Character character { get; }
+    public Character character;
 
     public bool selected;
     GameMaster gm;

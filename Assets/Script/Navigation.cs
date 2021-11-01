@@ -179,8 +179,9 @@ public class Navigation : MonoBehaviour
 
             foreach (Tile neighbourTiles in neighbour(instant))
             {
-                 //save RestMoveable
-                if (neighbourTiles.MoveCost(unit.character.MoveMethod) <= save)//if neighbourTiles cost lower than RestMoveable, mean it is achievable
+                //save RestMoveable
+                //if neighbourTiles cost lower than RestMoveable, mean it is achievable
+                if (neighbourTiles.MoveCost(unit.character.MoveMethod) <= save)
                 {
                     if (!HighlightTile.Contains(neighbourTiles.position) || (save - neighbourTiles.MoveCost(unit.character.MoveMethod)) > save)//if neighbourTiles was not be search or the new RestMoveable is higher than previous one
                     {

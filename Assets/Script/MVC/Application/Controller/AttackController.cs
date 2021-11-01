@@ -6,7 +6,9 @@ public class AttackController : ControllerBase
 {
     public override void Exceute(object param)
     {
+        //提取模型，并且进行战斗流程
         PlayerModel mb = MVC.instance.models["PlayerModel"] as PlayerModel;
 
     }
+
 }
