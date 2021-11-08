@@ -5,15 +5,61 @@ using System.Diagnostics;
 using System.Linq;
 using System.Text;
 using System.Threading;
+using Assets.Script.NewStruct;
+using JetBrains.Annotations;
+using Unity.Mathematics;
 using UnityEditorInternal;
 
-public class Character
+[Serializable]
+public class Character : IEntity
 {
     public int ID { get; }
+    public string Name { get; }
 
-    public String Name { get; }
+    private bool isDie;
+
+    public int HP
+    {
+        get
+        {
+            if (hp <= 0)
+            {
+                isDie = true;
+                return 0;
+            }
+
+            return math.min(hp, MaxHp);
+        }
+        set { hp = math.min(hp, MaxHp); }
+    }
 
     public int Level { get; private set; }
+
+    private int stamina;
+
+    private int speed;
+
+    private int intelligence;
+
+    private int strength;
+
+    private int fitness;
+
+    private int volition;
+
+    private int hp;
+
+    public int MaxHp
+    {
+        get { return Stamina * 2; }
+        private set { }
+    }
+
+    public int MaxExp
+    {
+        get { return (int) (100 * math.pow(1.25, Level)); }
+        private set { }
+    }
 
     /// <summary>
     /// property get method will return the value after buff effect
@@ -27,14 +73,14 @@ public class Character
             {
                 if (buff.EffectProperty == "Stamina")
                 {
+                    buffBonus += buff.EffectValue;
                 }
-
-                buffBonus += buff.EffectValue;
             }
 
-            return (int) (Stamina * buffBonus);
+            return (int) (stamina * buffBonus);
         }
-        private set { Stamina = value; }
+
+        private set { stamina = value; }
     }
 
     public int Speed
@@ -51,9 +97,9 @@ public class Character
                 buffBonus += buff.EffectValue;
             }
 
-            return (int) (Stamina * buffBonus);
+            return (int) (speed * buffBonus);
         }
-        private set { Speed = value; }
+        private set { speed = value; }
     }
 
     public int Intelligence
@@ -70,9 +116,9 @@ public class Character
                 buffBonus += buff.EffectValue;
             }
 
-            return (int) (Stamina * buffBonus);
+            return (int) (intelligence * buffBonus);
         }
-        private set { Intelligence = value; }
+        private set { intelligence = value; }
     }
 
     public int Strength
@@ -89,9 +135,9 @@ public class Character
                 buffBonus += buff.EffectValue;
             }
 
-            return (int) (Stamina * buffBonus);
+            return (int) (strength * buffBonus);
         }
-        private set { Strength = value; }
+        private set { strength = value; }
     }
 
     public int Fitness
@@ -108,9 +154,9 @@ public class Character
                 buffBonus += buff.EffectValue;
             }
 
-            return (int) (Stamina * buffBonus);
+            return (int) (fitness * buffBonus);
         }
-        private set { Fitness = value; }
+        private set { fitness = value; }
     }
 
     public int Volition
@@ -127,16 +173,17 @@ public class Character
                 buffBonus += buff.EffectValue;
             }
 
-            return (int) (Stamina * buffBonus);
+            return (int) (volition * buffBonus);
         }
-        private set { Volition = value; }
+        private set { volition = value; }
     }
 
-    public Dictionary<String, float> PropertyGrownRateDictionary { get; } // need refactor
 
-    public Dictionary<String, float> Proficiency { get; private set; } // need refactor
+    public Dictionary<string, float> PropertyGrownRateDictionary { get; } // need refactor
 
-    public AbstractClass AbstractClass { get; private set; }
+    public Dictionary<WeaponType, float> Proficiency { get; private set; } // need refactor
+
+    public Occupation Occupation { get; private set; }
 
     public Ability[] Abilities { get; set; }
 
@@ -150,7 +197,11 @@ public class Character
 
     public Item[] Items { get; set; }
 
-    public Weapon EquipedWeapon { get; private set; }
+    [CanBeNull] public Weapon EquippedWeapon { get; private set; }
+
+    public string Description { get; private set; }
+
+
 
     public Character(int id,
         string name,
@@ -162,55 +213,78 @@ public class Character
         int volition,
         MoveMethod moveMethod,
         ArmorType armorType,
-        Dictionary<String, float> proficiency,
-        Dictionary<String, float> propertyGrownRateDictionary,
-        Item[] items,
-        AbstractClass abstractClassName,
+        Dictionary<WeaponType, float> proficiency,
+        Dictionary<string, float> propertyGrownRateDictionary,
+        Occupation occupationName,
         Ability[] abilities)
     {
+        isDie = false;
         ID = id;
         Name = name;
-        Stamina = stamina;
-        Speed = speed;
-        Intelligence = intelligence;
-        Strength = strength;
-        Fitness = fitness;
-        Volition = volition;
+        EXP = 0;
+        MaxExp = 100;
+        this.stamina = stamina;
+        this.speed = speed;
+        this.intelligence = intelligence;
+        this.strength = strength;
+        this.fitness = fitness;
+        this.volition = volition;
         MoveMethod = moveMethod;
         ArmorType = armorType;
         Proficiency = proficiency;
         PropertyGrownRateDictionary = propertyGrownRateDictionary;
-        Items = items;
-        AbstractClass = abstractClassName;
+        Items = new Item[6];
+        Occupation = occupationName;
         Abilities = abilities;
+        Description = "";
+        Buffs = new List<Buff>();
         WeaponAutoEquip();
     }
 
-    public void AddEXP(int exp)
+
+    /// <summary>
+    /// 增加经验，触发事件，更新界面
+    /// increase Exp, trigger event, update relative interface
+    /// </summary>
+    /// <param name="exp">增加经验的数量</param>
+    public void AddExp(int exp)
     {
+        if (EXP < 0)
+        {
+            EXP = 0;
+        }
+
         int restEXP = exp + EXP - ExperienceSystem.MaxEXP(Level);
         if (restEXP >= 0)
         {
-            Levelup();
-            AddEXP(restEXP);
+            LevelUp();
+            AddExp(restEXP);
         }
         else
         {
             EXP += exp;
         }
+
+        CharacterModel.instance.ViewsUpdate(this);
     }
+
 
     /// <summary>
-    /// get bool by random in probability from PropertyGrownRateDictionary
+    /// 升级，触发事件，更新界面和升级特效
+    /// Level up, trigger event, update relative interface and update effect
     /// </summary>
-    public void Levelup()
+    public void LevelUp()
     {
         throw new System.NotImplementedException();
-    }
 
-    public Dictionary<String, int> GetAllOriginProperty()
+        CharacterModel.instance.LevelUp(this);
+        CharacterModel.instance.ViewsUpdate(this);
+    } // TODO: 升级系统
+
+
+    public Dictionary<string, int> GetAllOriginProperty()
     {
-        Dictionary<String, int> originPropertyDictionary = new Dictionary<string, int>();
+        Dictionary<string, int> originPropertyDictionary = new Dictionary<string, int>();
         originPropertyDictionary.Add("Stamina", Stamina);
         originPropertyDictionary.Add("Speed", Speed);
         originPropertyDictionary.Add("Intelligence", Intelligence);
@@ -220,11 +294,26 @@ public class Character
         return originPropertyDictionary;
     }
 
+
+    /// <summary>
+    /// Equip the weapon inside the backpack, trigger event
+    /// </summary>
+    /// <param name="weapon">the weapon inside the backpack</param>
     public void EquipWeapon(Weapon weapon)
     {
-        EquipedWeapon = weapon;
+        if (Items.Contains(weapon))
+        {
+            EquippedWeapon = weapon;
+        }
+        else throw new Exception("Weapon want be equipped is not in the backpack");
+
+        CharacterModel.instance.ViewsUpdate(this);
     }
 
+
+    /// <summary>
+    /// Automatic equip weapon, usually used in ctor
+    /// </summary>
     public void WeaponAutoEquip()
     {
         foreach (var item in Items)
@@ -237,14 +326,55 @@ public class Character
         }
     }
 
-    public void TransferClass(AbstractClass abstractClassName)
+
+    /// <summary>
+    /// 
+    /// </summary>
+    /// <param name="occupationName"></param>
+    public void TransferClass(Occupation occupationName)
     {
-        if (AbstractClass.IsTransferable)
+        if (Occupation.IsTransferable)
         {
-            if (AbstractClass.NextLevelClass.Contains(abstractClassName))
+            if (Occupation.NextLevelOccupation.Contains(occupationName))
             {
-                AbstractClass = abstractClassName;
+                Occupation = occupationName;
             }
         }
+
+        CharacterModel.instance.ViewsUpdate(this);
+    } //TODO: 
+
+
+    /// <summary>
+    /// Write the Description for the Charactor
+    /// </summary>
+    /// <param name="content">string insert in Description</param>
+    public void WriteDescription(string content)
+    {
+        Description += content;
     }
+
+
+    /// <summary>
+    /// 浅拷贝
+    /// </summary>
+    /// <returns>浅拷贝副本</returns>
+    public Character Clone()
+    {
+        return MemberwiseClone() as Character;
+    }
+
+
+
+
+    public bool LifeCheck()
+    {
+        if (isDie)
+        {
+            CharacterModel.instance.CharacterDie(this);
+            return false;
+        }
+        return true;
+    }
+
 }

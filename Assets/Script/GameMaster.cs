@@ -7,9 +7,27 @@ public class GameMaster : MonoBehaviour
 {
     public Unit selectedUnit;
 
-    public int PlayerTurn = 1;
+
+    [SerializeField]
+    public enum Turn
+    {
+        Player = 0,
+        Ally = 1,
+        Enemy = 2,
+        Neutrality = 3
+    }
+
+    public Turn PlayerTurn;
 
     public GameObject selectedUnitSquare;
+
+    void start()
+    {
+        PlayerTurn = Turn.Player;
+
+        //register view
+
+    }
 
     public void ResetTiles()
     {
@@ -34,21 +52,21 @@ public class GameMaster : MonoBehaviour
 
     public void EndTurn()
     {
-
         Debug.Log("EndTurn");
 
-        if (PlayerTurn == 1)
+        if (PlayerTurn == Turn.Neutrality)
         {
-            PlayerTurn = 2;
+            PlayerTurn = Turn.Player;
         }
-        else if (PlayerTurn ==2)
+        else
         {
-            PlayerTurn = 1;
+            PlayerTurn++;
         }
 
-        if (selectedUnit != null)//if some unit has been selected
+
+        if (selectedUnit != null) //if some unit has been selected
         {
-            selectedUnit.selected = false;//cancel selection
+            selectedUnit.selected = false; //cancel selection
             selectedUnit = null;
         }
 
@@ -56,7 +74,7 @@ public class GameMaster : MonoBehaviour
 
         foreach (Unit unit in FindObjectsOfType<Unit>())
         {
-            unit.hasMoved = false;//reset all unit to movable when turn end.
+            unit.hasMoved = false; //reset all unit to movable when turn end.
             unit.AttackSquare.SetActive(false);
             unit.hasAttacked = false;
         }

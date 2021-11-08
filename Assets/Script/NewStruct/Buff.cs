@@ -5,24 +5,11 @@ using System.Text;
 
 public abstract class Buff
 {
+    public int ID { get; }
+    public string name { get; }
 
-    public String EffectProperty { get;}
+    public string EffectProperty { get; }
 
     public float EffectValue { get; set; }
 
-    public Character Source
-    {
-        get => default;
-        set
-        {
-        }
-    }
-
-    public bool Activity
-    {
-        get => default;
-        set
-        {
-        }
-    }
 }

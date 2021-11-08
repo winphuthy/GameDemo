@@ -2,38 +2,14 @@
 using System.Collections.Generic;
 using System.Linq;
 using System.Text;
+using Assets.Script.NewStruct;
 
-public abstract class Item
+public interface Item 
 {
-    public int ItemID
-    {
-        get => default;
-        set
-        {
-        }
-    }
 
-    public int Name
-    {
-        get => default;
-        set
-        {
-        }
-    }
+    public int Price { get; }
 
-    public int Price
-    {
-        get => default;
-        set
-        {
-        }
-    }
+    public int Path { get; }
 
-    public int Path
-    {
-        get => default;
-        set
-        {
-        }
-    }
+    public string Description { get; }
 }

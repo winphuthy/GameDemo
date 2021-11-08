@@ -5,8 +5,6 @@ using UnityEngine;
 
 public class Navigation : MonoBehaviour
 {
-    public LayerMask UnitLayer;
-    public LayerMask TileLayer;
     Initalization init;
 
     private void Start()
@@ -172,7 +170,7 @@ public class Navigation : MonoBehaviour
 
         while (HighlightTile.Count != 0)//keep search neighbour tile
         {
-            Tile instant =GetTile(HighlightTile[0]);
+            Tile instant = GetTile(HighlightTile[0]);
             HighlightTile.RemoveAt(0);
             int save = TileCost[0];
             TileCost.RemoveAt(0);
@@ -198,8 +196,5 @@ public class Navigation : MonoBehaviour
             }
         }
     }
-
-
-
 }
 

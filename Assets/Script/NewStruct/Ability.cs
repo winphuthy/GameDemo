@@ -5,7 +5,12 @@ using System.Text;
 
 public abstract class Ability
 {
-    public String AbilityName;
+    public string AbilityName;
 
     public bool activable;
 }
+
+// public class myAbility
+// {
+//     private Ability a = new Ability();
+// }

@@ -6,15 +6,14 @@ using UnityEngine;
 public class Unit : MonoBehaviour
 {
     // Start is called before the first frame update
-
     public Character character;
-
     public bool selected;
+    // public int HP;
     GameMaster gm;
     Navigation N;
     public int RestMoveable;
     public bool hasMoved;
-    public int PlayerNumber;
+    public GameMaster.Turn PlayerNumber;
 
     public int AttackRange;
     List<Unit> enemiesInRange = new List<Unit>();
@@ -22,9 +21,6 @@ public class Unit : MonoBehaviour
     public GameObject AttackSquare;
 
     public Vector2Int position;
-
-
-
 
 
 
@@ -37,6 +33,8 @@ public class Unit : MonoBehaviour
     {
         gm = FindObjectOfType<GameMaster>();
         N = FindObjectOfType<Navigation>();
+        character = CharacterModel.instance.White;
+        // HP = character.Stamina;
     }
 
 
@@ -45,7 +43,7 @@ public class Unit : MonoBehaviour
         ResetAttackableIcon();
         UpdatePosition();
 
-        if (selected == true)//if this unit has been selected, cancel selected.
+        if (selected)//if this unit has been selected, cancel selected.
         {
             selected = false;
             gm.selectedUnit = null;
@@ -65,8 +63,8 @@ public class Unit : MonoBehaviour
 
                 gm.ResetTiles();
                 GetEnemies();
-                Debug.Log("before Achievable" + this.transform.position.ToString());
-                N.Achievable(this, N.GetTile(this), this.RestMoveable);//GetWalkableTiles();//search available tile
+                Debug.Log("before Achievable" + transform.position.ToString());
+                N.Achievable(this, N.GetTile(this), RestMoveable);//GetWalkableTiles();//search available tile
 
             }
             
@@ -75,12 +73,12 @@ public class Unit : MonoBehaviour
         Collider2D col = Physics2D.OverlapCircle(Camera.main.ScreenToWorldPoint(Input.mousePosition), 0.2f);
         Unit unit = col.GetComponent<Unit>();
 
-
+        //
         if (gm.selectedUnit != null)
         {
             if (gm.selectedUnit.enemiesInRange.Contains(unit) && gm.selectedUnit.hasAttacked == false)
             {
-                //gm.selectedUnit.Attack(unit);
+                // gm.selectedUnit.Attack(unit);
             }
         }
     }
@@ -90,15 +88,17 @@ public class Unit : MonoBehaviour
         position = Vector2Int.RoundToInt(transform.position);
     }
 
-    /*private void Attack(Unit enemy)
+    private void Attack(Unit enemy)
     {
         hasAttacked = true;
-        int enemyDamage = attackDamage - enemy.armor;
-        int myDamage = enemy.defenseDamage - armor;
+
+
+        /*int enemyDamage = attackDamage - Enemy.armor;
+        int myDamage = Enemy.defenseDamage - armor;
 
         if (enemyDamage >= 1)
         {
-            enemy.health -= enemyDamage;
+            Enemy.health -= enemyDamage;
             Debug.Log("Enemy damage deal");
         }
 
@@ -108,12 +108,15 @@ public class Unit : MonoBehaviour
             Debug.Log("My damage take");
         }
 
-        if (enemy.health <= 0)
+        if (Enemy.health <= 0)
         {
-            Destroy(enemy.gameObject);
+            Destroy(Enemy.gameObject);
             GetWalkableTiles();
-        }
-    }*/
+        }*/
+
+
+
+    }
 
     public void GetWalkableTiles()
     {
@@ -174,12 +177,12 @@ public class Unit : MonoBehaviour
         gm.ResetTiles();
         while (transform.position.x != tilePos.x)
         {
-            transform.position = Vector3.MoveTowards(transform.position, new Vector3(tilePos.x, transform.position.y, transform.position.z), character.AbstractClass.MoveRange * Time.deltaTime);
+            transform.position = Vector3.MoveTowards(transform.position, new Vector3(tilePos.x, transform.position.y, transform.position.z), character.Occupation.MoveRange * Time.deltaTime);
             yield return null;
         }
         while (transform.position.y != tilePos.y)
         {
-            transform.position = Vector3.MoveTowards(transform.position, new Vector3(transform.position.x, tilePos.y, transform.position.z), character.AbstractClass.MoveRange * Time.deltaTime);
+            transform.position = Vector3.MoveTowards(transform.position, new Vector3(transform.position.x, tilePos.y, transform.position.z), character.Occupation.MoveRange * Time.deltaTime);
             yield return null;
         }
 

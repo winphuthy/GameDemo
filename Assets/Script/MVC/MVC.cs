@@ -11,6 +11,7 @@ public class MVC
     {
     }
 
+    //用event关键字取代
     public Dictionary<string, ViewBase> views = new Dictionary<string, ViewBase>();
     public Dictionary<string, ModelBase> models = new Dictionary<string, ModelBase>();
     public Dictionary<string, Type> ctrls = new Dictionary<string, Type>();
@@ -50,22 +51,22 @@ public class MVC
 
     public void SendEvent(string eventName, object eventParam)
     {
-        //用event替代这部分
-        // if (ctrls.ContainsKey(eventName))
-        // {
-        //     Type ctrType = ctrls[eventName];
-        //     var controllerBase = Activator.CreateInstance(ctrType) as ControllerBase;
-        //     controllerBase.Exceute(eventParam);
-        //     return;
-        // }
-        //
-        // foreach (var view in views)
-        // {
-        //     if (view.Value.SubscribedEvents.Contains(eventName))
-        //     {
-        //         view.Value.HandleEvents(eventName, eventParam);
-        //     }
-        // }
+        
+        if (ctrls.ContainsKey(eventName))
+        {
+            Type ctrType = ctrls[eventName];
+            var controllerBase = Activator.CreateInstance(ctrType) as ControllerBase;
+            controllerBase.Exceute(eventParam);
+            return;
+        }
+        
+        foreach (var view in views)
+        {
+            if (view.Value.SubscribedEvents.Contains(eventName))
+            {
+                view.Value.HandleEvents(eventName, eventParam);
+            }
+        }
 
     }
 }

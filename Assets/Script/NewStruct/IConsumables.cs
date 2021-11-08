@@ -5,7 +5,7 @@ using System.Text;
 
 public interface IConsumables
 {
-    int[] Durablilty { get; }
+    public int[] Durability { get; }
 
-    void Use();
+    public void Use(int wastage);
 }
