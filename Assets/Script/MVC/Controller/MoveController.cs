@@ -1,27 +1,30 @@
 using System;
-using System.Collections;
-using System.Collections.Generic;
-using UnityEngine;
 
 public class MoveController : ControllerBase
 {
 
     public event EventHandler MoveEvent;
 
-    public MoveController instance = new MoveController();
+    public static MoveController instance = new MoveController();
+    private MoveController(){}
 
-    // MoveEventArgs moveEventArgs = new MoveEventArgs();
+
+    readonly MoveEventArgs moveEventArgs = new MoveEventArgs(new Tile[]{});//TODO: 完善这个移动系统
 
 
-    public override void Exceute(object param)
+    public void Exceute(object param)
     {
 
-        if (param is Character)
+        if (param is Unit)
         {
-            param = param as Character;
+            param = param as Unit;
+        }
+        else
+        {
+            throw new Exception("param is not a Unit");
         }
 
-        MoveEvent?.Invoke(param, EventArgs.Empty);
+        MoveEvent?.Invoke(param, moveEventArgs);
     }
 }
 

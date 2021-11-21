@@ -6,6 +6,11 @@ public class OccupationModel : ModelBase
 {
     public List<Occupation> list = new List<Occupation>();
 
+    public static OccupationModel instance = new OccupationModel();
+
+    private OccupationModel(){}
+
+
     public Occupation SwordMan = new Occupation(
         "SwordMan",
         "",
@@ -28,5 +33,4 @@ public class OccupationModel : ModelBase
             new Occupation[1]
         );
 
-    public static OccupationModel instance = new OccupationModel();
 }

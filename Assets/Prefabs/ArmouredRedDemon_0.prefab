@@ -127,16 +127,14 @@ MonoBehaviour:
   selected: 0
   RestMoveable: 3
   hasMoved: 0
-  MoveSpeed: 3
   PlayerNumber: 2
-  MoveMode: Onfoot
   AttackRange: 1
   hasAttacked: 0
   AttackSquare: {fileID: 6621321947127473435}
-  health: 10
-  attackDamage: 5
-  defenseDamage: 2
-  armor: 0
+  position: {x: 0, y: 0}
+  layerMask:
+    serializedVersion: 2
+    m_Bits: 256
 --- !u!114 &2047155527
 MonoBehaviour:
   m_ObjectHideFlags: 0

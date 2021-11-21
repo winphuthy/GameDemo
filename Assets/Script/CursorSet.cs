@@ -6,7 +6,7 @@ public class CursorSet : MonoBehaviour
 {
     private void Update()
     {
-        Vector2 cursoePos = Camera.main.ScreenToWorldPoint(Input.mousePosition);
+        Vector3 cursoePos = Camera.main.ScreenToWorldPoint(Input.mousePosition);
         transform.position = cursoePos;
 
     }

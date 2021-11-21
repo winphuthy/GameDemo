@@ -1,7 +1,4 @@
 ﻿using System;
-using System.Collections.Generic;
-using System.Linq;
-using System.Text;
 
 public abstract class Ability
 {
@@ -14,3 +11,20 @@ public abstract class Ability
 // {
 //     private Ability a = new Ability();
 // }
+
+
+public class SwordsmanAbility : Ability, ITriggered
+{
+    private Character AbilityOwner;
+
+    public void OnTriggered(object param, EventArgs e)
+    {
+        //TODO: 
+    }
+
+    public SwordsmanAbility(Character abilityOwner)
+    {
+        AbilityOwner = abilityOwner;
+        MoveController.instance.MoveEvent += OnTriggered;
+    }
+}

@@ -3,7 +3,7 @@ using System.Collections;
 using System.Collections.Generic;
 using UnityEngine;
 
-public abstract class ControllerBase
+public interface ControllerBase
 {
-    public abstract void Exceute(object param);
+    public void Exceute(object param);
 }

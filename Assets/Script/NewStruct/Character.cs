@@ -211,8 +211,6 @@ public class Character : IEntity
         int strength,
         int fitness,
         int volition,
-        MoveMethod moveMethod,
-        ArmorType armorType,
         Dictionary<WeaponType, float> proficiency,
         Dictionary<string, float> propertyGrownRateDictionary,
         Occupation occupationName,
@@ -229,12 +227,13 @@ public class Character : IEntity
         this.strength = strength;
         this.fitness = fitness;
         this.volition = volition;
-        MoveMethod = moveMethod;
-        ArmorType = armorType;
+        Occupation = occupationName;
+        MoveMethod = occupationName.MoveMethod;
+        ArmorType = occupationName.ArmorType;
         Proficiency = proficiency;
         PropertyGrownRateDictionary = propertyGrownRateDictionary;
         Items = new Item[6];
-        Occupation = occupationName;
+        
         Abilities = abilities;
         Description = "";
         Buffs = new List<Buff>();
@@ -328,7 +327,7 @@ public class Character : IEntity
 
 
     /// <summary>
-    /// 
+    /// 在职业提供的可转职职业中选择一个进行转职，同时更新角色的移动模式和装甲等级
     /// </summary>
     /// <param name="occupationName"></param>
     public void TransferClass(Occupation occupationName)

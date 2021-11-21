@@ -1,6 +1,7 @@
 using System;
 using System.Collections;
 using System.Collections.Generic;
+using JetBrains.Annotations;
 using UnityEngine;
 
 public class Tile : MonoBehaviour
@@ -13,19 +14,30 @@ public class Tile : MonoBehaviour
     GameMaster gm;
     public Sprite tileGraphics;
     public Vector2Int position;
-    public Vector2Int positionUp;
-    public Vector2Int positionDown;
-    public Vector2Int positionLeft;
-    public Vector2Int positionRight;
+    public Vector2Int UpTile;
+    public Vector2Int DownTile;
+    public Vector2Int LeftTile;
+    public Vector2Int RightTile;
+
+    public TileType tileType;
+
+    public int Onfoot;
+    public int Riding;
+    public int Flying;
+
 
 
     void OnEnable()
     {
-        position = Vector2Int.RoundToInt(transform.position);
-        positionUp.Set(position.x, position.y + 1);
-        positionDown.Set(position.x, position.y - 1);
-        positionRight.Set(position.x + 1, position.y);
-        positionLeft.Set(position.x - 1, position.y);
+        position = Vector2Int.RoundToInt(transform.localPosition);
+        UpTile = position + Vector2Int.up;
+        DownTile = position + Vector2Int.down;
+        LeftTile = position + Vector2Int.left;
+        RightTile = position + Vector2Int.right;
+
+        Onfoot = 1;
+        Riding = 1;
+        Flying = 1;
     }
 
     public int MoveCost(MoveMethod moveCost)
@@ -33,13 +45,13 @@ public class Tile : MonoBehaviour
         switch (moveCost)
         {
             case MoveMethod.Onfoot:
-                return 1;
+                return Onfoot;
             case MoveMethod.Riding:
-                return 1;
+                return Riding;
             case MoveMethod.Flying:
-                return 1;
+                return Flying;
             default:
-                throw new Exception();
+                throw new Exception("Data missing");
         }
     }
 
@@ -79,7 +91,7 @@ public class Tile : MonoBehaviour
     {
         if (isWalkable && gm.selectedUnit != null)
         {
-            gm.selectedUnit.Move(this.transform.position);
+            gm.selectedUnit.Move(position);
         }
     }
 }

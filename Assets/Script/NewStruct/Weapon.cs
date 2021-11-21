@@ -4,13 +4,19 @@ using System.Linq;
 using System.Text;
 using Assets.Script.NewStruct;
 
-public abstract class Weapon : Item, IConsumables, IEntity
+public class Weapon : Item, IConsumables, IEntity
 {
+    public int ID { get; }
+    public string Name { get; }
+    public int Price { get; }
+    public string Path { get; }
 
     /// <summary>
     /// weaponBonus in origin
     /// </summary>
     public float WeaponBonus { get; }
+
+
 
     public WeaponType[] WeaponType;
 
@@ -18,6 +24,36 @@ public abstract class Weapon : Item, IConsumables, IEntity
     /// Range of attack
     /// </summary>
     public int Range { get; }
+    /// <summary>
+    /// character equip will discount speed, usually negative number
+    /// </summary>
+    public int SpeedDiscount { get; }
+
+
+
+    public int[] Durability { get; }
+
+
+
+    public string Description { get; }
+
+    public Weapon(WeaponType[] weaponType, int id, string name, int price, string path, float weaponBonus, int range, int speedDiscount, int[] durability, string description)
+    {
+        WeaponType = weaponType;
+        ID = id;
+        Name = name;
+        Price = price;
+        Path = path;
+        WeaponBonus = weaponBonus;
+        Range = range;
+        SpeedDiscount = speedDiscount;
+        Durability = durability;
+        Description = description;
+    }
+    public void Use(int wastage)
+    {
+        Durability[0] -= wastage;
+    }
 
     /// <summary>
     /// input Enemy charactor get DamageBonus
@@ -27,13 +63,6 @@ public abstract class Weapon : Item, IConsumables, IEntity
         throw new NotImplementedException();
     }
 
-    protected Weapon(float weaponBonus, WeaponType[] weaponType, int range, int[] durability)
-    {
-        WeaponBonus = weaponBonus;
-        WeaponType = weaponType;
-        Range = range;
-        Durability = durability;
-    }
 
     /// <summary>
     /// 武器是否可用
@@ -56,17 +85,4 @@ public abstract class Weapon : Item, IConsumables, IEntity
 
         return true;
     }
-
-    public int[] Durability { get; }
-
-    public void Use(int wastage)
-    {
-        Durability[0] -= wastage;
-    }
-
-    public int ID { get; }
-    public string Name { get; }
-    public int Price { get; }
-    public int Path { get; }
-    public string Description { get; }
 }

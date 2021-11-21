@@ -1,65 +1,85 @@
+using System;
 using System.Collections;
 using System.Collections.Generic;
 using System.Linq;
+using JetBrains.Annotations;
+using Unity.Mathematics;
+using UnityEditor.SearchService;
 using UnityEngine;
 
-public class Navigation : MonoBehaviour
+public class Navigation : Singleton<Navigation>
 {
-    Initalization init;
+    public bool ShowGridNumb;
+    private Unit unit;
+    private Dictionary<Vector2Int, int> achievableList;
+    private List<Node> achievableNodes;
+    private List<Node> openArrayList;
+    private List<Node> closeArrayList;
+    private Vector2Int destionation;
+    private readonly Dictionary<Vector2Int, Tile> TileTable;
+    private readonly Dictionary<Vector2Int, Unit> UnitTable;
 
-    private void Start()
+    public GameObject DebugMesh;
+
+    private Navigation()
     {
-        init = GetComponent<Initalization>();
-        init = FindObjectOfType<Initalization>();
-
+        TileTable = MapModel.instance.TileTable;
+        UnitTable = MapModel.instance.UnitTable;
     }
 
-    public Unit GetUnit(Vector2Int TargetPosition)//get the unit in target position
+    public Unit GetUnit(Vector2Int TargetPosition) //get the unit in target position
     {
         //Debug.Log(TargetPosition);
-        return init.UnitTable[TargetPosition];
-        
+        return UnitTable[TargetPosition];
     }
 
-    public Unit GetUnit(Tile TargetTile)//get the unit in target position
+    public Unit GetUnit(Tile TargetTile) //get the unit in target position
     {
-
-        return GetUnit(TargetTile.position); 
-
+        return GetUnit(TargetTile.position);
     }
 
-    public Tile GetTile(Vector2Int TargetPosition)//get the tile in target position
+    public Tile GetTile(Vector2Int TargetPosition) //get the tile in target position
     {
         //Debug.Log("GetTile return" + tile.transform.position.ToString() + "    " + TileLayer);
-        return init.TileTable[TargetPosition]; 
+        return TileTable[TargetPosition];
     }
 
-    public Tile GetTile(Unit TargetUnit)//get the tile in target position
+    public Tile GetTile(Unit TargetUnit) //get the tile in target position
     {
         //Debug.Log("GetTile return" + tile.transform.position.ToString() + "    " + TileLayer);
-        return init.TileTable[TargetUnit.position];
+        return TileTable[TargetUnit.position];
     }
 
-    public List<Tile> neighbour(Tile tile)//get all 4 tile close to target tile
+    public int GetMoveCost(Vector2Int vector2Int)
     {
-        Debug.Log("get into neighbour" + tile.transform.position.ToString());
+        return TileTable[vector2Int].MoveCost(unit.character.MoveMethod);
+    }
 
-        List<Tile> neighbours = new List<Tile>();
-        if (init.TileTable.ContainsKey(tile.positionUp))
+    public List<Vector2Int> neighbour(Vector2Int vector2Int) //get all 4 tile close to target tile
+    {
+        Tile tile = GetTile(vector2Int);
+
+        Debug.Log("get into neighbour" + tile.transform.localPosition.ToString());
+
+        List<Vector2Int> neighbours = new List<Vector2Int>();
+        if (TileTable.ContainsKey(tile.UpTile))
         {
-            neighbours.Add(GetTile(tile.positionUp));
+            neighbours.Add(tile.UpTile);
         }
-        if (init.TileTable.ContainsKey(tile.positionDown))
+
+        if (TileTable.ContainsKey(tile.DownTile))
         {
-            neighbours.Add(GetTile(tile.positionDown));
+            neighbours.Add(tile.DownTile);
         }
-        if (init.TileTable.ContainsKey(tile.positionLeft))
+
+        if (TileTable.ContainsKey(tile.LeftTile))
         {
-            neighbours.Add(GetTile(tile.positionLeft));
+            neighbours.Add(tile.LeftTile);
         }
-        if (init.TileTable.ContainsKey(tile.positionRight))
+
+        if (TileTable.ContainsKey(tile.RightTile))
         {
-            neighbours.Add(GetTile(tile.positionRight));
+            neighbours.Add(tile.RightTile);
         }
 
         Debug.Log("neighbours finish " + neighbours.Count + " tiles within");
@@ -156,45 +176,286 @@ public class Navigation : MonoBehaviour
     }*/
 
 
-
-    public void Achievable(Unit unit, Tile tile, int RestMoveable)
+    /// <summary>
+    /// display every achiveable tile
+    /// </summary>
+    /// <param name="unit">the unity wanna move</param>
+    /// <param name="tile"> the tile unit stand on </param>
+    /// <param name="RestMoveable"> the range character can arrive</param>
+    public void Achievable(Unit unit)
     {
-        List<Vector2Int> HighlightTile = new List<Vector2Int>();
-        List<int> TileCost = new List<int>();
+        this.unit = unit;
+        destionation = new Vector2Int();
+        achievableList = new Dictionary<Vector2Int, int>();
+        Queue<Vector2Int> HighlightTile = new Queue<Vector2Int>();
+        Queue<int> restMoveableQueue = new Queue<int>();
 
         HighlightTile.Clear();
-        TileCost.Clear();
+        restMoveableQueue.Clear();
 
-        HighlightTile.Add(tile.position);
-        TileCost.Add(RestMoveable);
+        HighlightTile.Enqueue(GetTile(unit).position);
+        restMoveableQueue.Enqueue(unit.RestMoveable);
+        achievableList[GetTile(unit).position] = unit.RestMoveable;
 
-        while (HighlightTile.Count != 0)//keep search neighbour tile
+        while (HighlightTile.Count != 0) //keep search neighbour tile
         {
-            Tile instant = GetTile(HighlightTile[0]);
-            HighlightTile.RemoveAt(0);
-            int save = TileCost[0];
-            TileCost.RemoveAt(0);
+            Tile instance = GetTile(HighlightTile.Dequeue());
+            int restmoveableSave = restMoveableQueue.Dequeue();
 
-            foreach (Tile neighbourTiles in neighbour(instant))
+            foreach (var neighbourTile in neighbour(instance.position))
             {
                 //save RestMoveable
                 //if neighbourTiles cost lower than RestMoveable, mean it is achievable
-                if (neighbourTiles.MoveCost(unit.character.MoveMethod) <= save)
+
+                Tile neighbourTiles = GetTile(neighbourTile);
+
+                if (restmoveableSave - neighbourTiles.MoveCost(unit.character.MoveMethod) >= 0)
                 {
-                    if (!HighlightTile.Contains(neighbourTiles.position) || (save - neighbourTiles.MoveCost(unit.character.MoveMethod)) > save)//if neighbourTiles was not be search or the new RestMoveable is higher than previous one
+                    if (!achievableList.ContainsKey(neighbourTiles.position)
+                    ) //if neighbourTiles was not be search or the new RestMoveable is not lower or equal than previous one
                     {
-                        HighlightTile.Add(neighbourTiles.position);
-                        TileCost.Add(save - neighbourTiles.MoveCost(unit.character.MoveMethod));//add or reset 
+                        HighlightTile.Enqueue(neighbourTiles.position);
+                        achievableList[neighbourTiles.position] =
+                            restmoveableSave - neighbourTiles.MoveCost(unit.character.MoveMethod);
+                        restMoveableQueue.Enqueue(restmoveableSave -
+                                                  neighbourTiles.MoveCost(unit.character.MoveMethod)); //add or reset 
                         neighbourTiles.Highlight();
+
                         Debug.Log("neighbourTiles position    " + neighbourTiles.position.ToString());
                         Debug.Log("TileCost    " + neighbourTiles.MoveCost(unit.character.MoveMethod));
 
                         Debug.Log("HighlightTile    " + HighlightTile.Count);
-                        Debug.Log("TileCost count    " + TileCost.Count);
+                        Debug.Log("TileCost count    " + restMoveableQueue.Count);
+
+                        Debug.Log("position list: " + neighbourTiles.position.ToString());
+                        if (ShowGridNumb)
+                        {
+                            GameObject instanceGO =
+                                DebugMesh.transform.Find(
+                                    $"text_mesh ({neighbourTiles.position.y * 10 + neighbourTiles.position.x})").gameObject;
+                            instanceGO.GetComponent<TextMesh>().text =
+                                $"RC: {restmoveableSave - neighbourTiles.MoveCost(unit.character.MoveMethod)}";
+                        }
                     }
                 }
             }
         }
+
+        Debug.Log("achievableList.account:  " + achievableList.Count);
+    }
+
+
+    /*public void Achievable(Unit unit)
+    {
+        achievableList = new Dictionary<Tile, int>();// init dictionary
+        while (expression)
+        {
+            
+        }
+        foreach (var neighbourTile in neighbour(GetTile(unit)))// tourist 4 tile neighbour
+        {
+            //for each tile neighbour 
+            //the present rest movable point is the central tile movable point - present point
+            int restMoveAblePresent = neighbourTile.MoveCost(unit.character.MoveMethod);
+            if (!achievableList.ContainsKey(neighbourTile) || restMoveAblePresent >= 0)
+            {//if this tile did not be in highlight list and have enough point to arrive
+                achievableList.Add(neighbourTile, restMoveAblePresent);
+                neighbourTile.Highlight();
+            }
+        }
+    }*/
+
+
+    /// <summary>
+    /// Enter the destination, get the path to arrive the destination
+    /// </summary>
+    /// <param name="vector2">destination</param>
+    private class Node : IComparable
+    {
+        [CanBeNull] public Node Father;
+        public int G;
+        public int H;
+        public int F;
+        public Vector2Int Position;
+
+
+        public Node(Vector2Int Position)
+        {
+            Father = null;
+            this.Position = Position;
+            G = 0;
+            H = 0;
+            F = 0;
+        }
+
+        public Node(Node father, Vector2Int position)
+        {
+            Father = father;
+            Position = position;
+
+            G = Father.G + instance.GetMoveCost(position);
+            H = math.abs(Position.x - instance.destionation.x) + math.abs(Position.y - instance.destionation.y);
+            F = G + H;
+        }
+
+
+        public int CompareTo(object obj)
+        {
+            Node other = (Node) obj;
+            if (F < other.F)
+            {
+                return -1;
+            }
+            else if (F > other.F)
+            {
+                return 1;
+            }
+
+            return 0;
+        }
+    }
+
+    private Node searchNode(Vector2Int vector2Int, List<Node> nodes)
+    {
+        foreach (Node achievableNode in nodes)
+        {
+            if (achievableNode.Position == vector2Int)
+            {
+                return achievableNode;
+            }
+        }
+
+        return null;
+    }
+
+    public List<Vector2Int> GetPathToDestination(Unit unit, Vector2Int destionation)
+    {
+        achievableNodes = new List<Node>();
+        //generate node list for A*
+        foreach (var i in achievableList)
+        {
+            achievableNodes.Add(new Node(i.Key));
+        }
+
+        //search for endNode and startNode
+        Node endNode = searchNode(destionation, achievableNodes);
+        Node startNode = searchNode(unit.position, achievableNodes);
+
+        //check the start and end node has been set
+        if (endNode == null || startNode == null)
+        {
+            throw new Exception("A* error on set start and end node");
+        }
+
+        openArrayList = new List<Node>();
+        closeArrayList = new List<Node>();
+
+        openArrayList.Add(startNode);
+
+        int count = 0;
+
+        for (;;)
+        {
+            //safety
+            count++;
+            if (count >= 1000)
+            {
+                Debug.Log("stack over flow inside A*");
+                break;
+            }
+
+            if (openArrayList.Count == 0)
+            {
+                Debug.Log("Over, no path can achieve destination, something go wrong");
+                return null;
+            }
+
+            /*foreach (var node in openArrayList)
+            {
+                if (node.Position == destionation)
+                {
+                    break;
+                }
+            }*/
+
+            if (searchNode(destionation, openArrayList) != null)
+            {
+                Debug.Log("Found!");
+
+                break;
+            }
+
+            Node instance = openArrayList[0];
+
+            foreach (var node in neighbour(instance.Position))
+            {
+                node.ToString();
+                Node nextNode = searchNode(node, achievableNodes);
+
+                if (nextNode == null)
+                {
+                    continue;
+                }
+
+                if (achievableNodes.Contains(nextNode) && !closeArrayList.Contains(nextNode))
+                {
+                    //if instance.g + cost of next node < node.g which has been record in openlist, overwrite it
+                    Node recordedNode = null;
+
+                    foreach (Node achievableNode in openArrayList)
+                    {
+                        if (achievableNode.Position == node)
+                        {
+                            recordedNode = achievableNode;
+                        }
+                    }
+
+                    Node newNode = new Node(instance, nextNode.Position);
+
+                    if (recordedNode == null)
+                    {
+                        openArrayList.Add(newNode);
+                    }
+
+                    else if (newNode.G == 0 || recordedNode.G > newNode.G)
+                    {
+                        recordedNode.G = instance.G + GetMoveCost(nextNode.Position);
+                        recordedNode.Father = instance;
+                    }
+                    /*else
+                    {
+                        throw new Exception("A* error, get error on update neighbour node");
+                    }*/
+
+
+                    openArrayList.Sort();
+                }
+            }
+
+            closeArrayList.Add(instance);
+
+            openArrayList.Remove(instance);
+        }
+
+
+        //record Path to List and transform to Tile 
+        Node transformNode = searchNode(destionation, openArrayList);
+        List<Vector2Int> pathTiles = new List<Vector2Int>();
+        int conut = 0;
+        do
+        {
+            conut++;
+            if (conut > 1000)
+            {
+                Debug.Log("stack over flow, transform to tile list error");
+                break;
+            }
+
+            pathTiles.Add(transformNode.Position);
+            transformNode = transformNode.Father;
+            transformNode.ToString();
+        } while (transformNode.Father != null);
+
+        return pathTiles;
     }
 }
-

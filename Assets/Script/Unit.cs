@@ -7,7 +7,9 @@ public class Unit : MonoBehaviour
 {
     // Start is called before the first frame update
     public Character character;
+
     public bool selected;
+
     // public int HP;
     GameMaster gm;
     Navigation N;
@@ -22,8 +24,6 @@ public class Unit : MonoBehaviour
 
     public Vector2Int position;
 
-
-
     private void OnEnable()
     {
         UpdatePosition();
@@ -32,48 +32,49 @@ public class Unit : MonoBehaviour
     private void Start()
     {
         gm = FindObjectOfType<GameMaster>();
-        N = FindObjectOfType<Navigation>();
+        N = Navigation.instance;
         character = CharacterModel.instance.White;
         // HP = character.Stamina;
     }
-
 
     private void OnMouseDown()
     {
         ResetAttackableIcon();
         UpdatePosition();
 
-        if (selected)//if this unit has been selected, cancel selected.
+        if (selected) //if this unit has been selected, cancel selected.
         {
             selected = false;
             gm.selectedUnit = null;
             gm.ResetTiles();
+            Debug.Log("selected cancelled");
         }
-        else// if did not selected this unit
+        else // if did not selected this unit
         {
-            if (PlayerNumber == gm.PlayerTurn)// if unit is below to play in the turn
+            if (PlayerNumber == gm.PlayerTurn) // if unit is below to play in the turn
             {
-                if (gm.selectedUnit != null)//but select other unit
+                if (gm.selectedUnit != null) //but select other unit
                 {
-                    gm.selectedUnit.selected = false;//cancel the selection from other unit
+                    gm.selectedUnit.selected = false; //cancel the selection from other unit
                 }
 
-                selected = true;//select this unit 
+                selected = true; //select this unit 
                 gm.selectedUnit = this;
+                Debug.Log($"{name}:{position} has been selected");
 
                 gm.ResetTiles();
                 GetEnemies();
-                Debug.Log("before Achievable" + transform.position.ToString());
-                N.Achievable(this, N.GetTile(this), RestMoveable);//GetWalkableTiles();//search available tile
-
+                Debug.Log("before Achievable" + transform.localPosition);
+                if (hasMoved != this)
+                {
+                    N.Achievable(this); //GetWalkableTiles();//search available tile
+                }
             }
-            
         }
 
         Collider2D col = Physics2D.OverlapCircle(Camera.main.ScreenToWorldPoint(Input.mousePosition), 0.2f);
         Unit unit = col.GetComponent<Unit>();
 
-        //
         if (gm.selectedUnit != null)
         {
             if (gm.selectedUnit.enemiesInRange.Contains(unit) && gm.selectedUnit.hasAttacked == false)
@@ -85,7 +86,7 @@ public class Unit : MonoBehaviour
 
     private void UpdatePosition()
     {
-        position = Vector2Int.RoundToInt(transform.position);
+        position = Vector2Int.RoundToInt(transform.localPosition);
     }
 
     private void Attack(Unit enemy)
@@ -113,25 +114,22 @@ public class Unit : MonoBehaviour
             Destroy(Enemy.gameObject);
             GetWalkableTiles();
         }*/
-
-
-
     }
 
     public void GetWalkableTiles()
     {
-        if (hasMoved == true)//if no more step left
+        if (hasMoved) //if no more step left
         {
-            return;//return null
+            return; //return null
         }
-        foreach (Tile tile in FindObjectsOfType<Tile>())
+
+        foreach (var tile in MapModel.instance.TileTable)
         {
-            if (Mathf.Abs(transform.position.x - tile.transform.position.x) + 
-                Mathf.Abs(transform.position.y - tile.transform.position.y) <= RestMoveable)
+            if (Mathf.Abs(transform.position.x - tile.Value.transform.position.x) +
+                Mathf.Abs(transform.position.y - tile.Value.transform.position.y) <= RestMoveable)
             {
-                tile.Highlight();
+                tile.Value.Highlight();
             }
-            
         }
     }
 
@@ -140,18 +138,19 @@ public class Unit : MonoBehaviour
     {
         enemiesInRange.Clear();
 
-        foreach (Unit unit in FindObjectsOfType<Unit>())
+        foreach (var unit in MapModel.instance.UnitTable)
         {
-            if (Mathf.Abs(transform.position.x - unit.transform.position.x) + Mathf.Abs(transform.position.y - unit.transform.position.y) <= AttackRange)
+
+            if (Mathf.Abs(transform.position.x - unit.Value.transform.position.x) +
+                Mathf.Abs(transform.position.y - unit.Value.transform.position.y) <= AttackRange)
             {
-                if (unit.PlayerNumber != gm.PlayerTurn)
+                if (unit.Value.PlayerNumber != gm.PlayerTurn)
                 {
-                    enemiesInRange.Add(unit);
-                    unit.AttackSquare.SetActive(true);
-                    unit.AttackSquare.transform.position = unit.transform.position;
+                    enemiesInRange.Add(unit.Value);
+                    unit.Value.AttackSquare.SetActive(true);
+                    unit.Value.AttackSquare.transform.position = unit.Value.transform.position;
                     /*instant = Instantiate(AttackSquare);
                     instant.SetActive(true);*/
-
                 }
             }
         }
@@ -160,36 +159,69 @@ public class Unit : MonoBehaviour
     public void ResetAttackableIcon() //reset the attackable 
     {
         Debug.Log("Attackable Icon reset");
-        foreach (Unit unit in FindObjectsOfType<Unit>())
+        foreach (var unit in MapModel.instance.UnitTable)
+        {
+            unit.Value.AttackSquare.SetActive(false);
+        }
+        /*foreach (Unit unit in FindObjectsOfType<Unit>())
         {
             unit.AttackSquare.SetActive(false);
-        }
+        }*/
     }
 
 
-    public void Move(Vector2 tilePos) // move character
+    public void Move(Vector2Int destination) // move character
     {
-        StartCoroutine(StartMovement(tilePos));
+        StartCoroutine(StartMovement(destination));
     }
 
-    IEnumerator StartMovement(Vector2 tilePos)
+    IEnumerator StartMovement(Vector2Int destination)
     {
         gm.ResetTiles();
-        while (transform.position.x != tilePos.x)
+
+
+        /*foreach (var vector2Int in Navigation.instance.GetPathToDestination(this, destination))
         {
-            transform.position = Vector3.MoveTowards(transform.position, new Vector3(tilePos.x, transform.position.y, transform.position.z), character.Occupation.MoveRange * Time.deltaTime);
-            yield return null;
-        }
-        while (transform.position.y != tilePos.y)
+            while (transform.position.x != vector2Int.x)
+            {
+                transform.position = Vector3.MoveTowards(transform.position,
+                    new Vector3(vector2Int.x, transform.position.y, transform.position.z),
+                    character.Occupation.MoveRange * Time.deltaTime);
+                yield return null;
+            }
+
+            while (transform.position.y != vector2Int.y)
+            {
+                transform.position = Vector3.MoveTowards(transform.position,
+                    new Vector3(transform.position.x, vector2Int.y, transform.position.z),
+                    character.Occupation.MoveRange * Time.deltaTime);
+                yield return null;
+            }
+        }*/
+
+        List<Vector2Int> path = Navigation.instance.GetPathToDestination(this, destination);
+
+        for (int i = path.Count - 1; i >= 0; i--)
         {
-            transform.position = Vector3.MoveTowards(transform.position, new Vector3(transform.position.x, tilePos.y, transform.position.z), character.Occupation.MoveRange * Time.deltaTime);
-            yield return null;
+            while (transform.position.x != path[i].x)
+            {
+                transform.position = Vector3.MoveTowards(transform.position,
+                    new Vector3(path[i].x, transform.position.y, transform.position.z),
+                    character.Occupation.MoveRange * Time.deltaTime);
+                yield return null;
+            }
+
+            while (transform.position.y != path[i].y)
+            {
+                transform.position = Vector3.MoveTowards(transform.position,
+                    new Vector3(transform.position.x, path[i].y, transform.position.z),
+                    character.Occupation.MoveRange * Time.deltaTime);
+                yield return null;
+            }
         }
 
-        
         hasMoved = true;
         ResetAttackableIcon();
         GetEnemies();
     }
-
 }
